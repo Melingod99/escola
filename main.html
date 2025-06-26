@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_REPO = 'https://github.com/Melingod99/escola'
+    }
+
+    stages {
+        stage('Clonar Repositório') {
+            steps {
+                git credentialsId: 'github-token', url: "${GIT_REPO}"
+            }
+        }
+
+        stage('Rodar NGINX com Docker') {
+            steps {
+                sh """
+                mkdir -p html
+                cp main.html html/index.html
+                docker run -d --name nginx-web -p 8083:80 -v \$(pwd)/html:/usr/share/nginx/html nginx
+                """
+            }
+        }
+    }
+}
